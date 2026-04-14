@@ -1,0 +1,1030 @@
+<!DOCTYPE html><html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Атмосферный сайт о SCP Foundation: история, структура, классы объектов и принципы работы фонда." />
+  <title>SCP Foundation | Secure. Contain. Protect.</title>
+  <style>
+    :root {
+      --bg: #07090d;
+      --bg-2: #0d121a;
+      --panel: rgba(14, 20, 30, 0.78);
+      --panel-strong: rgba(18, 26, 38, 0.92);
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #e8edf5;
+      --muted: #9aa7b8;
+      --accent: #8bd3ff;
+      --accent-2: #b38cff;
+      --danger: #ff6b81;
+      --success: #66e0a3;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+      --radius: 22px;
+    }* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(139, 211, 255, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 10%, rgba(179, 140, 255, 0.10), transparent 26%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black 50%, transparent 100%);
+  opacity: 0.35;
+  z-index: 0;
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.23'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(18px);
+  background: rgba(6, 9, 13, 0.62);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-inner {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+  min-width: 0;
+}
+
+.seal {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff, #cfd9e8 22%, #4d5c73 53%, #1a2432 100%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 10px 28px rgba(0,0,0,0.4);
+  position: relative;
+  flex: 0 0 auto;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.seal::before,
+.seal::after {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 50%;
+}
+
+.seal::after {
+  inset: 18px;
+  border-width: 1px;
+  opacity: 0.65;
+}
+
+.brand-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  min-width: 0;
+}
+
+.brand-title strong {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.92rem;
+}
+
+.brand-title span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: 0.25s ease;
+  font-size: 0.95rem;
+}
+
+.nav a:hover {
+  color: var(--text);
+  border-color: var(--line);
+  background: rgba(255,255,255,0.04);
+  transform: translateY(-1px);
+}
+
+.hero {
+  padding: 76px 0 26px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 22px;
+  align-items: stretch;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(18px);
+}
+
+.hero-main {
+  padding: 34px;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.06), transparent 35%),
+    radial-gradient(circle at top right, rgba(139,211,255,0.12), transparent 30%),
+    var(--panel);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  color: #d5deeb;
+  background: rgba(255,255,255,0.04);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.eyebrow b {
+  color: var(--success);
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 5vw, 4.9rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #ffffff, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lead {
+  max-width: 64ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  padding: 13px 18px;
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.25s ease;
+  transform: translateY(0);
+  user-select: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, rgba(139,211,255,0.95), rgba(179,140,255,0.95));
+  color: #05111d;
+  box-shadow: 0 12px 28px rgba(139,211,255,0.2);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.hero-aside {
+  padding: 24px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.03), transparent),
+    var(--panel-strong);
+}
+
+.status {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+}
+
+.status-label {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 6px;
+}
+
+.status-value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 18px rgba(102, 224, 163, 0.8);
+  animation: blink 1.8s ease-in-out infinite;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stat strong {
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.section {
+  padding: 28px 0;
+}
+
+.section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-head p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 58ch;
+  line-height: 1.65;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  transition: 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(139,211,255,0.08), transparent 30%, rgba(179,140,255,0.06));
+  opacity: 0;
+  transition: 0.3s ease;
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.14);
+}
+
+.card:hover::before { opacity: 1; }
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.15rem;
+}
+
+.card p {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #dce6f5;
+  font-size: 0.88rem;
+}
+
+.timeline {
+  display: grid;
+  gap: 14px;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+}
+
+.timeline-item strong {
+  color: var(--accent);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+}
+
+.timeline-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.scp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.filter-btn {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+  background: rgba(139,211,255,0.16);
+  border-color: rgba(139,211,255,0.35);
+}
+
+.scp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.scp-card {
+  position: relative;
+  min-height: 250px;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.scp-card .inner {
+  height: 100%;
+  padding: 22px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.scp-card:hover .inner {
+  transform: translateY(-4px) scale(1.01);
+  border-color: rgba(139,211,255,0.28);
+}
+
+.scp-id {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.scp-class {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 12px;
+  margin-bottom: 10px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.safe { background: rgba(102, 224, 163, 0.13); color: #9af0c2; }
+.euclid { background: rgba(139, 211, 255, 0.12); color: #a9ddff; }
+.keter { background: rgba(255, 107, 129, 0.12); color: #ff9ab0; }
+
+.scp-card h3 { margin: 0; font-size: 1.25rem; }
+.scp-card p { color: var(--muted); line-height: 1.65; }
+.mini-link {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.92rem;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.88;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.list-item {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--line);
+}
+
+.list-item strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.list-item span {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.warning-box {
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 107, 129, 0.28);
+  background: linear-gradient(180deg, rgba(255, 107, 129, 0.10), rgba(255,255,255,0.03));
+}
+
+.warning-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #ffd0d8;
+}
+
+.warning-box p {
+  margin: 0;
+  color: #f0d7dc;
+  line-height: 1.7;
+}
+
+footer {
+  padding: 34px 0 44px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.scroll-top {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 30;
+  border: 1px solid var(--line);
+  background: rgba(8, 12, 18, 0.75);
+  color: var(--text);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: 0.25s ease;
+}
+
+.scroll-top.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes blink {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.8); opacity: 0.6; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@media (max-width: 980px) {
+  .hero-grid,
+  .facts,
+  .grid-3,
+  .scp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-item {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-main {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .topbar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .hero {
+    padding-top: 32px;
+  }
+
+  .hero-main,
+  .hero-aside,
+  .card,
+  .timeline-item,
+  .warning-box {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  h1 {
+    font-size: clamp(2.1rem, 11vw, 3.8rem);
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="noise"></div>  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#home">
+        <div class="seal" aria-hidden="true"></div>
+        <div class="brand-title">
+          <strong>SCP Foundation</strong>
+          <span>Secure. Contain. Protect.</span>
+        </div>
+      </a><nav class="nav">
+    <a href="#about">О фонде</a>
+    <a href="#mission">Миссия</a>
+    <a href="#structure">Структура</a>
+    <a href="#scp">Объекты</a>
+    <a href="#rules">Правила</a>
+  </nav>
+</div>
+
+  </header>  <main class="wrap" id="home">
+    <section class="hero reveal">
+      <div class="hero-grid">
+        <article class="panel hero-main">
+          <div>
+            <div class="eyebrow"><b>●</b> Доступ уровня 3 | Материал открыт для внутреннего просмотра</div>
+            <h1 class="gradient-text" style="margin-top:18px;">SCP Foundation</h1>
+            <p class="lead">
+              SCP Foundation — это вымышленная секретная организация, которая занимается обнаружением,
+              изоляцией и изучением аномальных объектов, существ, мест и явлений. Фонд скрывает аномальное
+              от общества и старается не допустить глобальных катастроф.
+            </p>
+            <p class="lead">
+              На сайте собрана базовая энциклопедия: как устроен фонд, какие у него цели, как классифицируют
+              объекты и почему аномалии так опасны.
+            </p>
+          </div><div class="hero-actions">
+        <a class="btn btn-primary" href="#scp">Смотреть объекты</a>
+        <a class="btn btn-secondary" href="#about">Узнать больше</a>
+      </div>
+    </article>
+
+    <aside class="panel hero-aside">
+      <div class="status">
+        <div class="status-label">Статус объекта</div>
+        <div class="status-value"><span class="dot"></span> Контainment активен</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <strong>1900+</strong>
+          <span>известных SCP-объектов в лоре сообщества</span>
+        </div>
+        <div class="stat">
+          <strong>24/7</strong>
+          <span>наблюдение, эксперименты и карантин</span>
+        </div>
+        <div class="stat">
+          <strong>∞</strong>
+          <span>варианты аномалий: от статуй до реальности</span>
+        </div>
+        <div class="stat">
+          <strong>███</strong>
+          <span>часть информации всегда скрыта</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="about" class="section reveal">
+  <div class="section-head">
+    <div>
+      <h2>Что такое SCP Foundation</h2>
+      <p>Фонд существует как секретная международная структура, которая работает вне обычных законов ради сохранения безопасности человечества.</p>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <h3>Secure — обеспечить безопасность</h3>
+      <p>Фонд делает все возможное, чтобы аномальные явления не попадали в руки гражданских, террористов или других опасных групп.</p>
+    </div>
+    <div class="card">
+      <h3>Contain — удержать под контролем</h3>
+      <p>Каждый объект получает специальные протоколы, камеры, лаборатории, охрану и методы нейтрализации рисков.</p>
+    </div>
+    <div class="card">
+      <h3>Protect — защитить человечество</h3>
+      <p>Главная цель фонда — защитить людей от последствий аномалий, даже если ради этого приходится скрывать правду.</p>
+    </div>
+  </div>
+</section>
+
+<section id="mission" class="section reveal">
+  <div class="section-head">
+    <div>
+      <h2>Чем занимается фонд</h2>
+      <p>Работа SCP Foundation охватывает сбор информации, захват аномалий, их исследование и постоянный контроль риска.</p>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <strong>01 / Поиск</strong>
+      <p>Агенты и информаторы находят аномальные события, закрывают свидетелей, изолируют место происшествия и собирают доказательства.</p>
+    </div>
+    <div class="timeline-item">
+      <strong>02 / Захват</strong>
+      <p>Объект перевозят в безопасную зону. Иногда используются специальные ловушки, мобильные отряды и маскировка под обычные службы.</p>
+    </div>
+    <div class="timeline-item">
+      <strong>03 / Исследование</strong>
+      <p>Ученые анализируют свойства SCP: поведение, опасность, влияние на людей, слабости и возможные методы удержания.</p>
+    </div>
+    <div class="timeline-item">
+      <strong>04 / Сдерживание</strong>
+      <p>После изучения фонд строит протоколы содержания: камеры, манипуляторы, запреты, ритуалы, испытания или полную изоляцию.</p>
+    </div>
+  </div>
+</section>
+
+<section id="structure" class="section reveal">
+  <div class="section-head">
+    <div>
+      <h2>Структура и внутренний порядок</h2>
+      <p>Фонд устроен как очень крупная организация с учеными, охраной, мобильными группами, администрацией и руководством.</p>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <h3>Научный персонал</h3>
+      <p>Изучает SCP-объекты, ведет документацию, проводит эксперименты и составляет отчеты по уровню угрозы.</p>
+      <div class="chip-row">
+        <span class="chip">Документы</span>
+        <span class="chip">Эксперименты</span>
+        <span class="chip">Анализ</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Охрана и MTF</h3>
+      <p>Мобильные оперативные группы реагируют на вспышки аномалий, проводят зачистки и помогают перевозить опасные объекты.</p>
+      <div class="chip-row">
+        <span class="chip">Операции</span>
+        <span class="chip">Зачистка</span>
+        <span class="chip">Транспортировка</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Командование</h3>
+      <p>Контролирует доступ, бюджеты, протоколы и секретность. Многие материалы доступны только по уровню допуска.</p>
+      <div class="chip-row">
+        <span class="chip">Доступ</span>
+        <span class="chip">Секретность</span>
+        <span class="chip">Контроль</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scp" class="section reveal">
+  <div class="section-head">
+    <div>
+      <h2>Примеры известных SCP</h2>
+      <p>Ниже — несколько самых узнаваемых объектов. Кнопки фильтра помогают быстро менять типы объектов на странице.</p>
+    </div>
+  </div>
+
+  <div class="scp-toolbar">
+    <button class="filter-btn active" data-filter="all">Все</button>
+    <button class="filter-btn" data-filter="safe">Safe</button>
+    <button class="filter-btn" data-filter="euclid">Euclid</button>
+    <button class="filter-btn" data-filter="keter">Keter</button>
+  </div>
+
+  <div class="scp-grid">
+    <article class="scp-card" data-class="keter">
+      <div class="inner">
+        <div>
+          <div class="scp-id">SCP-173</div>
+          <span class="scp-class keter">Keter</span>
+          <h3>Скульптура</h3>
+          <p>Опасная статуя, которая двигается, когда на неё никто не смотрит. Требует постоянного визуального контакта.</p>
+        </div>
+        <a class="mini-link" href="#rules">Читать протокол →</a>
+      </div>
+    </article>
+
+    <article class="scp-card" data-class="keter">
+      <div class="inner">
+        <div>
+          <div class="scp-id">SCP-096</div>
+          <span class="scp-class keter">Keter</span>
+          <h3>Стеснительный человек</h3>
+          <p>Реагирует на взгляд на своё лицо и может впасть в неостановимую агрессию. Особо опасен при нарушении правил просмотра.</p>
+        </div>
+        <a class="mini-link" href="#rules">Читать протокол →</a>
+      </div>
+    </article>
+
+    <article class="scp-card" data-class="euclid">
+      <div class="inner">
+        <div>
+          <div class="scp-id">SCP-049</div>
+          <span class="scp-class euclid">Euclid</span>
+          <h3>Чумной доктор</h3>
+          <p>Говорит о «лечении» людей и ведёт себя как учёный прошлого. Иногда сотрудничает, но остается непредсказуемым.</p>
+        </div>
+        <a class="mini-link" href="#rules">Читать протокол →</a>
+      </div>
+    </article>
+
+    <article class="scp-card" data-class="safe">
+      <div class="inner">
+        <div>
+          <div class="scp-id">SCP-999</div>
+          <span class="scp-class safe">Safe</span>
+          <h3>Желейное существо</h3>
+          <p>Обычно безвредное и дружелюбное существо, известное позитивным влиянием на настроение людей.</p>
+        </div>
+        <a class="mini-link" href="#rules">Читать протокол →</a>
+      </div>
+    </article>
+
+    <article class="scp-card" data-class="euclid">
+      <div class="inner">
+        <div>
+          <div class="scp-id">SCP-3008</div>
+          <span class="scp-class euclid">Euclid</span>
+          <h3>Бесконечный магазин</h3>
+          <p>Пространство, похожее на крупный магазин мебели, из которого сложно выбраться. Внутри есть собственные опасности и правила.</p>
+        </div>
+        <a class="mini-link" href="#rules">Читать протокол →</a>
+      </div>
+    </article>
+
+    <article class="scp-card" data-class="keter">
+      <div class="inner">
+        <div>
+          <div class="scp-id">SCP-682</div>
+          <span class="scp-class keter">Keter</span>
+          <h3>Неуничтожимая рептилия</h3>
+          <p>Один из самых опасных объектов фонда. Отличается высокой адаптивностью и крайне агрессивным поведением.</p>
+        </div>
+        <a class="mini-link" href="#rules">Читать протокол →</a>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="rules" class="section reveal">
+  <div class="section-head">
+    <div>
+      <h2>Классификация и правила</h2>
+      <p>В SCP чаще всего используют простую классификацию по степени сложности удержания. Чем выше риск, тем сложнее протоколы.</p>
+    </div>
+  </div>
+
+  <div class="facts">
+    <div class="list">
+      <div class="list-item">
+        <strong>Safe</strong>
+        <span>Объекты, которые достаточно изучены и могут быть надежно удержаны при соблюдении правил.</span>
+      </div>
+      <div class="list-item">
+        <strong>Euclid</strong>
+        <span>Непредсказуемые или недостаточно изученные аномалии. Удержание возможно, но требует контроля.</span>
+      </div>
+      <div class="list-item">
+        <strong>Keter</strong>
+        <span>Очень опасные объекты, которые трудно или почти невозможно удержать стандартными методами.</span>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <h3>Внутреннее предупреждение</h3>
+      <p>
+        Любая ошибка персонала может привести к утечке информации, заражению зоны или нарушению протокола.
+        Именно поэтому фонд держит данные под уровнем допуска и часто использует маскировку, ложные отчеты и изоляцию свидетелей.
+      </p>
+    </div>
+  </div>
+</section>
+
+  </main>  <footer>
+    SCP Foundation — атмосферный учебный проект. Secure. Contain. Protect.
+  </footer><button class="scroll-top" id="scrollTop" aria-label="Наверх">↑</button>
+
+  <script>
+    const revealElements = document.querySelectorAll('.reveal');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const scpCards = document.querySelectorAll('.scp-card');
+    const scrollTopBtn = document.getElementById('scrollTop');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    revealElements.forEach(el => observer.observe(el));
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.filter;
+        scpCards.forEach(card => {
+          const cardClass = card.dataset.class;
+          const show = filter === 'all' || filter === cardClass;
+          card.style.display = show ? 'block' : 'none';
+        });
+      });
+    });
+
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.classList.toggle('show', window.scrollY > 400);
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script></body>
+</html>
